@@ -19,7 +19,7 @@ def show_page():
         )
 
         # Button to Trigger API Call
-        if st.button("Submit Job Description"):
+        if st.button("Process Job Description"):
             if job_description:
                 with st.spinner("Analyzing Job Description... ⏳"):
                     evaluation_categories = extract_evaluation_categories(job_description)  # OpenAI API Call
@@ -31,11 +31,19 @@ def show_page():
             else:
                 st.warning("Please enter a job description before submitting.")
 
-    # Display Extracted Evaluation Categories
+    # Editable Multi-Select Tags for Categories
     if "evaluation_categories" in st.session_state:
         st.subheader("🔍 AI-Generated Evaluation Categories")
-        for category in st.session_state["evaluation_categories"]:
-            st.write(f"- {category}")
+        
+        # Multi-Select Input (Recruiters Can Modify)
+        selected_categories = st.multiselect(
+            "Modify Categories:", 
+            options=st.session_state["evaluation_categories"],  # AI suggestions
+            default=st.session_state["evaluation_categories"]   # Preselected values
+        )
+
+        # Save modified categories back to session state
+        st.session_state["evaluation_categories"] = selected_categories
 
     st.divider()
 

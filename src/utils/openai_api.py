@@ -1,10 +1,10 @@
-import openai
+from openai import OpenAI
 import os
 from dotenv import load_dotenv
 
 # Load environment variables
 load_dotenv()
-OPENAI_API_KEY = os.getenv("OPENAI_API_KEY")
+client = OpenAI(api_key=os.getenv("OPENAI_API_KEY"))
 
 def extract_evaluation_categories(job_description):
     """
@@ -18,21 +18,21 @@ def extract_evaluation_categories(job_description):
     """
 
     # OpenAI API Call
-    response = openai.ChatCompletion.create(
-        model="gpt-4",  # Ensure you're using an advanced model
-        messages=[
-            {"role": "system", "content": "You are an expert recruiter assistant. Given a job description, extract the key evaluation categories for screening applicants."},
-            {"role": "user", "content": f"Analyze the following job description and extract 3-10 key evaluation categories:\n\n{job_description}"}
-        ],
-        temperature=0.7,
-        max_tokens=150
-    )
+    response = client.chat.completions.create(model="gpt-4o",  # Ensure you're using an advanced model
+    messages=[
+        {"role": "system", "content": "You are an expert recruiter assistant. Given a job description, identify key evaluation categories that will be used for each applicant. You will eventually be asked to provide numerical proficiency scores for each category for each applicant you see. Remember, each category can be a maximum of 3 words."},
+        {"role": "user", "content": f"Analyze the following job description and extract 3-10 key proficiency evaluation categories that will be required for this job description. Return a list of only the categories, with no additional text. Each category must not be more than 3 words. No numerical numbering required, just return the list.:\n\n{job_description}"}
+    ],
+    temperature=0.7,
+    max_tokens=150)
 
     # Extract AI response text
-    raw_text = response["choices"][0]["message"]["content"].strip()
+    raw_text = response.choices[0].message.content.strip()
 
     # Convert response to list format
     categories = raw_text.split("\n")
-    categories = [category.strip("-• ") for category in categories if category]  # Clean up bullet points
+
+    print(categories)
+    categories = [category.strip("- ") for category in categories if category]  # Clean up bullet points
 
     return categories
