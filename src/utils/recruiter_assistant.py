@@ -8,7 +8,7 @@ import json
 load_dotenv()
 
 # Get API key from environment variable
-api_key = os.getenv("OPENAI_API_KEY")
+api_key = os.getenv("REAL_OPENAI_API_KEY")
 if not api_key:
     raise ValueError("API key not found. Make sure OPENAI_API_KEY is set in your .env file")
 

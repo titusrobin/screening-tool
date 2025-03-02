@@ -36,3 +36,22 @@ def extract_evaluation_categories(job_description):
     categories = [category.strip("- ") for category in categories if category]  # Clean up bullet points
 
     return categories
+
+def get_ai_question():
+    """
+    Generates a dynamic interview question using OpenAI.
+
+    Returns:
+        str: A new AI-generated interview question.
+    """
+    response = client.chat.completions.create(
+        model="gpt-4o",
+        messages=[
+            {"role": "system", "content": "You are an AI interviewer. Generate a relevant question based on job-specific evaluation categories."},
+            {"role": "user", "content": "Generate an intelligent interview question for an applicant applying for this role."}
+        ],
+        temperature=0.7,
+        max_tokens=50
+    )
+
+    return response["choices"][0]["message"]["content"].strip()
