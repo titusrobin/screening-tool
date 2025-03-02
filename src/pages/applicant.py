@@ -8,7 +8,7 @@ def show_page():
     
     if 'new_response' not in st.session_state:
         st.session_state.new_response = ""
-        
+
     try:
         ASSISTANT_ID = st.session_state['assistant_id']
         THREAD_ID = st.session_state['thread_id']
@@ -57,8 +57,8 @@ def submit_response():
         st.session_state.user_input = ""
 
 def show_chat():
-    if "chat_history" not in st.session_state:
-        st.session_state["chat_history"] = []
+    
+    st.session_state["chat_history"] = []
 
     for chat in st.session_state["chat_history"]:
         if chat["role"] == "user":
