@@ -1,5 +1,5 @@
 import streamlit as st
-from src.utils.openai_api import get_ai_question  # Function to generate AI questions dynamically
+from utils.openai_api import get_ai_question  # Function to generate AI questions dynamically
 
 def show_page():
     st.title("Applicant Interface")

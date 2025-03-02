@@ -1,5 +1,6 @@
 import streamlit as st
 from pages import recruiter  # Import Tab 1
+from pages import applicant
 
 # Set Streamlit Page Config
 st.set_page_config(page_title="Applicant Screening", layout="wide")
@@ -10,8 +11,8 @@ tab_selection = st.sidebar.radio("Go to:", ["Recruiter Interface", "Applicant In
 
 # Route to the correct page
 if tab_selection == "Recruiter Interface":
-    recruiter.show_page()  # Call the function from recruiter.py
+    recruiter.show_page() 
 elif tab_selection == "Applicant Interface":
-    st.write("Applicant Interface (Tab 2) - Coming Soon...")
+    applicant.show_page()
 elif tab_selection == "Recruiter Dashboard":
     st.write("Recruiter Dashboard (Tab 3) - Coming Soon...")
