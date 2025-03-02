@@ -1,5 +1,4 @@
 import streamlit as st
-from utils.openai_api import extract_evaluation_categories
 from utils.recruiter_assistant import create_recruiter_assistant
 
 
@@ -63,4 +62,5 @@ def show_page():
 
     if st.button("Submit Interview Setup"):
         st.success("Interview setup submitted! ✅")
+        return st.session_state['assistant_id'], st.session_state['thread_id']
         

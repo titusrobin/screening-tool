@@ -1,5 +1,5 @@
 import streamlit as st
-from pages import recruiter  # Import Tab 1
+from pages import recruiter
 from pages import applicant
 
 # Set Streamlit Page Config

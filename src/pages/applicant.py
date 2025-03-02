@@ -1,9 +1,19 @@
 import streamlit as st
-from utils.openai_api import get_ai_question  # Function to generate AI questions dynamically
 from utils.recruiter_assistant import send_message
 
+
 def show_page():
+
     st.title("Applicant Interface")
+    
+    if 'new_response' not in st.session_state:
+        st.session_state.new_response = ""
+        
+    try:
+        ASSISTANT_ID = st.session_state['assistant_id']
+        THREAD_ID = st.session_state['thread_id']
+    except:
+        st.subheader("Warning: AI Assistant has not been initialized yet, go to recruiter tab and submit a job description.")
 
     # Step 1: Collect Applicant Information
     st.subheader("1️⃣ Enter Your Information")
@@ -17,49 +27,46 @@ def show_page():
 
     # Step 2: Start Interview
     st.subheader("2️⃣ Start Your Interview")
-    if st.button("Start Interview"):
-        st.session_state["interview_started"] = True  # Mark interview as started
 
-    # Step 3: Question / Response Conversation
-    if "interview_started" in st.session_state:
-        st.subheader("3️⃣ Interview Questions")
+    st.button("Start Interview", on_click=start_interview)
 
-        if "applicant_responses" not in st.session_state:
-            st.session_state["applicant_responses"] = []
+    st.divider()
 
-        # Dynamic AI-Generated Questions
-        if "interview_mode" in st.session_state and st.session_state["interview_mode"] == "Conversational":
-            if st.button("Get Next AI Question"):
-                new_question = get_ai_question()
-                st.session_state["applicant_responses"].append({"question": new_question, "answer": ""})
+    # Step 3: Display Conversation
+    st.subheader("3️⃣ Interview Conversation")
 
-        # Display and capture responses
-        for idx, qa in enumerate(st.session_state["applicant_responses"]):
-            st.write(f"**Q{idx+1}: {qa['question']}**")
-            st.session_state["applicant_responses"][idx]["answer"] = st.text_area(
-                f"Your Response {idx+1}",
-                value=qa["answer"],
-                key=f"response_{idx}"
-            )
+    show_chat()
 
-        st.divider()
+    st.text_input("Your Response", key="user_input")
 
-        # Step 4: Final Comments
-        st.subheader("4️⃣ Final Comments")
-        final_comment = st.text_area("Do you have any final comments for the recruiter?")
-        st.session_state["final_comment"] = final_comment
+    st.button("Send Response", on_click=submit_response)
+            
+    st.divider()
 
-        # Step 5: Submit Response
-        if st.button("Submit Interview"):
-            st.session_state["interview_complete"] = True
-            st.success("Your responses have been recorded! ✅")
+def submit_response():
+    if st.session_state.user_input.strip():
+        # Add user message to chat history
+        st.session_state["chat_history"].append({"role": "user", "content": st.session_state.user_input})
 
-            # Store all responses for recruiter review
-            applicant_data = {
-                "applicant_info": st.session_state["applicant_info"],
-                "responses": st.session_state["applicant_responses"],
-                "final_comment": final_comment
-            }
+        with st.spinner("Waiting for AI response..."):
+            ai_response = send_message(st.session_state['thread_id'], st.session_state['assistant_id'], st.session_state.user_input)
+        
+        # Store AI response
+        st.session_state["chat_history"].append({"role": "assistant", "content": ai_response})
 
-            # Save data (Future: Store in DB)
-            st.session_state["submitted_applicant_data"] = applicant_data
+        st.session_state.user_input = ""
+
+def show_chat():
+    if "chat_history" not in st.session_state:
+        st.session_state["chat_history"] = []
+
+    for chat in st.session_state["chat_history"]:
+        if chat["role"] == "user":
+            st.markdown(f"**You:** {chat['content']}")
+        else:
+            st.markdown(f"**AI:** {chat['content']}")
+
+def start_interview():
+    with st.spinner("Initializing AI Screening..."):
+        first_response = send_message(st.session_state['thread_id'], st.session_state['assistant_id'], "start screening 3")
+    st.session_state["chat_history"].append({"role": "assistant", "content": first_response})
